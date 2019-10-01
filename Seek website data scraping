@@ -1,0 +1,93 @@
+Sub Macro3()
+'
+' Macro3 Macro
+'
+
+'
+Dim FoundRange As Range
+Dim LastCell As Range
+Dim XC As Range
+Dim i As Integer
+Dim r As Range, rowz As Long, j As Long
+
+' Delete first bit of shit'
+Range("A1").Select
+Set FoundRange = Cells.Find("SavedApplied")
+
+rows("1:" & FoundRange.Row).Select
+Selection.Delete Shift:=xlUp
+
+'Delete second bit of shit'
+Range("A1").Select
+
+Set LastCell = Selection.End(xlDown)
+Set FoundRange = Cells.Find("PrevNext")
+
+rows(FoundRange.Row & ":" & LastCell.Row).Select
+Selection.Delete Shift:=xlUp
+
+Set LastCell = ActiveSheet.UsedRange.End(xlDown)
+Range("A1").Select
+
+For Each XC In ActiveSheet.UsedRange
+ If XC = "Add Notes" Then
+  XC.Delete Shift:=xlUp
+ End If
+Next
+
+For Each XC In ActiveSheet.UsedRange
+ If XC = "Remove Job" Then
+  XC.Delete Shift:=xlUp
+ End If
+Next
+
+For Each XC In ActiveSheet.UsedRange
+ If XC = "Download Resume" Then
+  XC.Delete Shift:=xlUp
+ End If
+Next
+
+For Each XC In ActiveSheet.UsedRange
+ If XC = "No Cover Letter" Then
+  XC.Delete Shift:=xlUp
+ End If
+Next
+
+For Each XC In ActiveSheet.UsedRange
+ If InStr(1, XC, "Job Title:", 0) Then
+    For i = 1 To 3
+    Cells((XC.Row + i), XC.Column).Select
+    Selection.Cut Destination:=Cells(XC.Row, (XC.Column + i))
+    Next
+ End If
+Next
+    
+Set r = ActiveSheet.UsedRange
+rowz = r.rows.Count
+  For j = rowz To 1 Step (-1)
+    If WorksheetFunction.CountA(r.rows(j)) = 0 Then r.rows(j).Delete
+  Next
+  
+    Columns("B:B").Select
+    Application.CutCopyMode = False
+    Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+
+Set r = ActiveSheet.UsedRange
+rowz = r.rows.Count
+  
+  For i = 1 To rowz
+    Set myCell = Range("A" & i)
+    
+    myCell.Value = Right(myCell.Value, Len(myCell.Value) - InStr(myCell.Value, "Job Title:") - 9)
+    myCell.Value = Left(myCell.Value, InStr(myCell.Value, "Job posted") - 1)
+    Range("B" & i).Value = Right(myCell.Value, Len(myCell.Value) - InStr(myCell.Value, "Advertiser:") - 10)
+    myCell.Value = Left(myCell.Value, InStr(myCell.Value, "Advertiser:") - 1)
+    
+    Set myCell = Range("C" & i)
+    myCell.Value = Right(myCell.Value, Len(myCell.Value) - InStr(myCell.Value, "Location:") - 8)
+    Set myCell = Range("E" & i)
+    myCell.Value = Mid(myCell.Value, InStr(myCell.Value, "2018") - 7, 11)
+  Next
+  
+
+End Sub
